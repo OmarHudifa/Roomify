@@ -1,8 +1,19 @@
-import { ArrowRight, Layers } from 'lucide-react'
-import React from 'react'
+import { ArrowRight, Layers} from 'lucide-react'
+import React, { useRef, useState } from 'react'
 import Button from './ui/Button'
+import Upload from './Upload'
+import { useNavigate } from 'react-router'
+
+
+
 
 const Hero = () => {
+  const navigate=useNavigate()
+  const handleUploadComplete=async(base64Image:string)=>{
+    const newId=Date.now().toString()
+    navigate(`/visualizer/${newId}`)
+  }
+   
   return (
    <section className="hero"> 
       <div className="announce">
@@ -30,7 +41,7 @@ const Hero = () => {
             <h3>Upload your floor plan</h3>
             <p>Supports JPG,PNG, formats up to 10MB</p>
         </div>
-        <p>Upload images</p>
+        <Upload onComplete={handleUploadComplete} />
       </div>
     </div>
 
