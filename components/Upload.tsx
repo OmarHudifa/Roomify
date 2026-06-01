@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useOutletContext} from "react-router";
 import {CheckCircle2, ImageIcon, UploadIcon} from "lucide-react";
 import {PROGRESS_INCREMENT, REDIRECT_DELAY_MS, PROGRESS_INTERVAL_MS} from "../lib/constants";
+import AuthModal from './AuthModal';
 
 interface UploadProps {
     onComplete?: (base64Data: string) => void;
@@ -20,7 +21,13 @@ const Upload = ({ onComplete }: UploadProps) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const [showAuthModal, setShowAuthModal] = useState(false)
+
 const handleClick = () => { 
+     if (!isSignedIn) {
+            setShowAuthModal(true) 
+            return
+        }
     inputRef.current?.click();
 };
 
@@ -38,7 +45,9 @@ const handleClick = () => {
     }, []);
 
     const processFile = useCallback((file: File) => {
-        if (!isSignedIn) return;
+        if (!isSignedIn) {
+            return
+        };
 
         setFile(file);
         setProgress(0);
@@ -92,7 +101,10 @@ const handleClick = () => {
         e.preventDefault();
         setIsDragging(false);
 
-        if (!isSignedIn) return;
+        if (!isSignedIn) {
+            setShowAuthModal(true) 
+            return
+        }
 
         const droppedFile = e.dataTransfer.files[0];
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
@@ -111,6 +123,8 @@ const handleClick = () => {
     };
 
     return (
+        <>
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
         <div className="upload">
             {!file ? (
                 <div
@@ -167,6 +181,7 @@ const handleClick = () => {
                 </div>
             )}
         </div>
+        </>
     )
 }
 export default Upload

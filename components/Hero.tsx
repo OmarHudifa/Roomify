@@ -3,15 +3,39 @@ import React, { useRef, useState } from 'react'
 import Button from './ui/Button'
 import Upload from './Upload'
 import { useNavigate } from 'react-router'
+import { createProject } from 'lib/puter.action'
 
 
 
 
-const Hero = () => {
+const Hero = ({ onProjectCreated }: { onProjectCreated: (p: DesignItem) => void }) => {
   const navigate=useNavigate()
+  
   const handleUploadComplete=async(base64Image:string)=>{
     const newId=Date.now().toString()
-    navigate(`/visualizer/${newId}`)
+    const name=`residence ${newId}`
+
+    const newItem={
+      id:newId,name,sourceImage:base64Image,renderedImage:undefined,timestamp:Date.now()
+    }
+
+    const saved=await createProject({item:newItem,visibility:'private'
+    })
+
+    if(!saved){
+      console.error("Failed to create project")
+      return false
+    }
+
+   onProjectCreated(newItem)
+
+    navigate(`/visualizer/${newId}`,{
+      state:{
+        initialImage:saved?.sourceImage,
+        initialRendered:saved?.renderedImage||null,
+        name
+      }
+    })
   }
    
   return (
