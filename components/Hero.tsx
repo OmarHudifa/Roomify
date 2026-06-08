@@ -10,8 +10,16 @@ import { createProject } from 'lib/puter.action'
 
 const Hero = ({ onProjectCreated }: { onProjectCreated: (p: DesignItem) => void }) => {
   const navigate=useNavigate()
-  
+   const isCreatingProjectRef=useRef(false)
+
+
   const handleUploadComplete=async(base64Image:string)=>{
+    try {
+
+    if(isCreatingProjectRef.current)return false
+
+    isCreatingProjectRef.current=true
+
     const newId=Date.now().toString()
     const name=`residence ${newId}`
 
@@ -27,15 +35,21 @@ const Hero = ({ onProjectCreated }: { onProjectCreated: (p: DesignItem) => void 
       return false
     }
 
-   onProjectCreated(newItem)
+    onProjectCreated(newItem)
 
-    navigate(`/visualizer/${newId}`,{
-      state:{
-        initialImage:saved?.sourceImage,
-        initialRendered:saved?.renderedImage||null,
-        name
-      }
-    })
+      navigate(`/visualizer/${newId}`,{
+        state:{
+          initialImage:saved?.sourceImage,
+          initialRendered:saved?.renderedImage||null,
+          name
+        }
+      })
+    return true
+
+    } finally{
+      isCreatingProjectRef.current=false
+    }
+  
   }
    
   return (

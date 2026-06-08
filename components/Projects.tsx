@@ -1,7 +1,22 @@
+import { getProjects } from 'lib/puter.action'
 import { ArrowUpRight, Clock } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, type Dispatch, type SetStateAction } from 'react'
+import { useNavigate } from 'react-router'
 
-const Projects = ({ projects }: { projects: DesignItem[] }) => {
+const Projects = ({ projects, setProjects }: { 
+    projects: DesignItem[]
+    setProjects: Dispatch<SetStateAction<DesignItem[]>>
+}) => {
+
+   useEffect(()=>{
+    const fetchProjects=async()=>{
+        const items=await getProjects()
+        setProjects(items)
+    }
+    fetchProjects()
+   },[]) 
+
+   const navigate=useNavigate()
   return (
  <section className="projects">
               <div className="section-inner">
@@ -13,7 +28,7 @@ const Projects = ({ projects }: { projects: DesignItem[] }) => {
                   </div>
         <div className='projects-grid'>
             {projects.map(({id,name,renderedImage,sourceImage,timestamp})=>(
-                        <div className='project-card group'>
+                        <div key={id} className='project-card group' onClick={()=>navigate(`/visualizer/${id}`)}>
                     <div className='preview'>
                         <img src={renderedImage||sourceImage} alt="project" />
                         <div className="badge">
